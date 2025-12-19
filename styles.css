@@ -1,10 +1,16 @@
 body {
-	margin: 0;
-	padding: 0;
+	margin: 0 100px 100px;
+	padding: 0 0 100px;
 	height: 120vh;
 	background: #000;
 	color: #fff;
 	font-family: 'Courier New', Courier, monospace;
+	border-radius: 0;
+}
+
+.glitch-text, h1, h2 {
+	margin-top: 0;
+	margin-bottom: 0.35em;
 }
 
 a {

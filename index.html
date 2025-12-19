@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Hacklet - A Hack Club Event">
+    <meta name="author" content="Hack Club" />
+    <meta property="og:type" content="website" />
+    <meta name="keywords" content="hacklet, bookmarklet, hackclub, ysws, clubs" />
     <title>Hacklet</title>
     <link rel="icon" href="icon.png" type="image/png" />
     <link rel="apple-touch-icon" href="icon.png" />
@@ -14,7 +18,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/terser@5.39.0/dist/bundle.min.js"></script>
 
-    <!-- and it's easy to individually load additional languages -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
 
     <script>
@@ -23,24 +26,27 @@
   </head>
 
   <body>
+    
     <div class="github-mark">
       <a href="https://github.com/PianoMan0/hacklet" target="_blank">
         <img src="github-mark.svg" alt="GitHub Mark" />
       </a>
     </div>
-    <div class="glitch-container">
-      <h1>Hacklet</h1>
-      <h1>Embark on a journey to bookmark the future. (This YSWS ended. But you can find more in <a href="https://ysws.hackclub.com">here!)</a></h1>
+    
+      <center>
+        <h1 class="glitch-text" data-text="Hacklet">Hacklet</h1>
+        <a href="https://hackclub.com"><img style="position: absolute; top: 0; left: 10px; border: 0; width: 256px; z-index: 999;" src="https://assets.hackclub.com/flag-orpheus-left.svg"></a>
+      <h2>Embark on a journey to bookmark the future.</h2>
       <h3>
-        Hacklet is a finished <a href="https://ysws.hackclub.com">YSWS</a> about
-        Bookmarklets.
+        Hacklet is a <a href="https://ysws.hackclub.com" target="_blank">YSWS</a> about
+        bookmarklets.
       </h3>
-      <h3>Build a bookmarklet, get a domain.</h3>
+      <h3>Build a bookmarklet, get a donuts.</h3>
       <a
         href="rules.html"
         style="display: inline-flex; align-items: center; gap: 5px"
       >
-        <h3 style="margin: 0">The Rules</h3>
+      <h3 style="margin: 0">The Rules</h3>
       </a>
       <span
         style="
@@ -73,12 +79,12 @@
             Write a JavaScript function to perform the desired task. For
             example:
             <pre>
-                        <code class="language-js">
-javascript:(function() {
-    alert('Hello, this is a bookmarklet!');
-})();
-                        </code>
-                    </pre>
+              <code class="language-js">
+                javascript:(function() {
+                  alert('Hello, this is a bookmarklet!');
+                })();
+              </code>
+            </pre>
           </li>
           <li>
             Copy the code and prepend it with the `javascript:` prefix. Remove
@@ -114,9 +120,9 @@ javascript:(function() {
         >
         <textarea id="bookmarklet-code" rows="4" cols="50"></textarea>
         <br />
-        <button type="button" onclick="testBookmarklet()">
-          Test Bookmarklet
-        </button>
+        <button type="button" onclick="testBookmarklet()">Test Bookmarklet</button>
+        <button type="button" onclick="saveAndShare()">Save & Share</button>
+        <button type="button" onclick="getShareLink()">Get Share Link</button>
       </form>
       <br />
       <a
@@ -127,19 +133,31 @@ javascript:(function() {
       >
       <p>
         With amazing bug fixing by
-        <a href="https://github.com/isaacfonner">Charmunk</a>,
-        <a href="https://saahild.com">Neon</a>!
+        <a href="https://github.com/Charmunks" target="_blank">Charmunk</a>,
+        <a href="https://saahild.com" target="_blank">Neon</a>!
       </p>
     </div>
+    </span>
+    </center>
     <script>
       function minifyJS(code) {
+        // Try to use Terser if available, but avoid throwing if it's not
         try {
-          const minified = Terser.minify_sync(code).code;
-          return minified ? "javascript:" + minified : code;
+          if (window.Terser && typeof Terser.minify === 'function') {
+            const result = Terser.minify(code);
+            // Terser.minify may return a Promise in the browser bundle
+            if (result && typeof result.then === 'function') {
+              result
+                .then((r) => console.log('minified (async):', r && r.code))
+                .catch(() => {});
+              return 'javascript:' + code;
+            }
+            if (result && result.code) return 'javascript:' + result.code;
+          }
         } catch (error) {
-          alert("Error while minifying code: " + error.message);
-          return code;
+          console.warn('Terser minify failed, returning original code', error);
         }
+        return 'javascript:' + code;
       }
       function testBookmarklet() {
         const code = document.getElementById("bookmarklet-code").value;
@@ -153,6 +171,58 @@ javascript:(function() {
           }
         } catch (error) {
           alert("Error in bookmarklet code: " + error.message);
+        }
+      }
+
+      function saveAndShare() {
+        const code = document.getElementById('bookmarklet-code').value || '';
+        if (!code.trim().startsWith('javascript:')) {
+          alert('Bookmarklet must start with "javascript:"');
+          return;
+        }
+        const name = prompt('Project name (optional)') || '';
+        const description = prompt('Short description (optional)') || '';
+        const id = 'local-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+        const payload = { code, name, description, savedAt: Date.now() };
+        try {
+          localStorage.setItem('hacklet:' + id, JSON.stringify(payload));
+        } catch (e) {
+          console.warn('Could not save to localStorage', e);
+        }
+        const url = new URL('preview.html', window.location.href);
+        url.searchParams.set('id', id);
+        const href = url.href;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(href).then(() => alert('Saved locally and copied link to clipboard: ' + href));
+        } else {
+          alert('Saved locally. Share this URL: ' + href);
+        }
+        window.open(href, '_blank');
+      }
+
+      function getShareLink() {
+        const code = document.getElementById('bookmarklet-code').value || '';
+        if (!code.trim().startsWith('javascript:')) {
+          alert('Bookmarklet must start with "javascript:"');
+          return;
+        }
+        const name = prompt('Project name (optional)') || '';
+        const description = prompt('Short description (optional)') || '';
+        const payloadObj = { code, name, description, createdAt: Date.now() };
+        try {
+          const json = JSON.stringify(payloadObj);
+          const b64 = btoa(unescape(encodeURIComponent(json)));
+          const url = new URL('preview.html', window.location.href);
+          url.searchParams.set('payload', b64);
+          const href = url.href;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(href).then(() => alert('Share link copied to clipboard: ' + href));
+          } else {
+            alert('Share link: ' + href);
+          }
+        } catch (e) {
+          console.error('Error creating share link', e);
+          alert('Error creating share link: ' + e.message);
         }
       }
     </script>

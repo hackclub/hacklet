@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Hacklet - A Hack Club Event">
+    <meta name="author" content="Hack Club" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="icon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="icon.png" />
     <style>
       body {
         margin: 0;
@@ -83,53 +90,109 @@ Loading...</pre>
       <button type="button" onclick="testBookmarklet()">Test Bookmarklet</button>
     </form>
     <script>
-      const id = new URLSearchParams(window.location.search).get('id');
-      if (id) {
-        document.getElementById('record-id').innerText = id;
-
-        const url = 'https://api2.hackclub.com/v0.1/Hacklet/Hacklet%20Project%20Submission';
-        fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
-            const record = data.find((item) => item.id == id);
-            if (record) {
-              document.getElementById('record-name').innerText = record.fields['Project Name'];
-              document.getElementById('record-description').innerText = record.fields['Description'];
-              document.getElementById('record-code').innerText = record.fields['Bookmarklet Code'];
-              document.getElementById('test-bookmarklet').href = record.fields['Bookmarklet Code'];
-            } else {
-              document.getElementById('record-name').innerText = 'Record not found';
-            }
-          })
-          .catch((error) => {
-            document.getElementById('record-name').innerText = 'Error fetching data';
-            console.error('Error:', error);
-          });
-      } else {
-        document.getElementById('record-name').innerText = 'No ID provided in URL';
+      // Decode base64-encoded JSON payload
+      function decodePayload(b64) {
+        try {
+          const json = decodeURIComponent(escape(atob(b64)));
+          return JSON.parse(json);
+        } catch (e) {
+          console.error('Failed to decode payload', e);
+          return null;
+        }
       }
 
-    function testBookmarklet() {
+      function populateFromObject(obj, sourceLabel) {
+        if (!obj) return;
+        document.getElementById('record-id').innerText = sourceLabel || '';
+        document.getElementById('record-name').innerText = obj.name || sourceLabel || 'Bookmarklet';
+        document.getElementById('record-description').innerText = obj.description || '';
+        const code = obj.code || '';
+        document.getElementById('record-code').innerText = code;
+        document.getElementById('test-bookmarklet').href = code || '#';
+      }
+
+      (function init() {
+        const params = new URLSearchParams(window.location.search);
+        const payload = params.get('payload');
+        const id = params.get('id');
+
+        if (payload) {
+          const obj = decodePayload(payload);
+          if (obj) {
+            populateFromObject(obj, 'Shared Bookmarklet');
+            document.getElementById('record-id').innerText = 'shared';
+            return;
+          }
+          document.getElementById('record-name').innerText = 'Invalid payload';
+          return;
+        }
+
+        if (id) {
+          document.getElementById('record-id').innerText = id;
+          // support local saved items saved under 'hacklet:<id>' in localStorage
+          if (id.startsWith('local-')) {
+            try {
+              const raw = localStorage.getItem('hacklet:' + id);
+              if (raw) {
+                const obj = JSON.parse(raw);
+                populateFromObject(obj, 'Local Bookmarklet');
+                return;
+              }
+              document.getElementById('record-name').innerText = 'Local record not found';
+              return;
+            } catch (e) {
+              console.error('Error reading local record', e);
+              document.getElementById('record-name').innerText = 'Error reading local record';
+              return;
+            }
+          }
+
+          // fallback to remote fetch for non-local ids
+          const url = 'https://api2.hackclub.com/v0.1/Hacklet/Hacklet%20Project%20Submission';
+          fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+              const record = data.find((item) => item.id == id);
+              if (record) {
+                populateFromObject({
+                  name: record.fields['Project Name'],
+                  description: record.fields['Description'],
+                  code: record.fields['Bookmarklet Code']
+                }, 'Remote Bookmarklet');
+              } else {
+                document.getElementById('record-name').innerText = 'Record not found';
+              }
+            })
+            .catch((error) => {
+              document.getElementById('record-name').innerText = 'Error fetching data';
+              console.error('Error:', error);
+            });
+        } else {
+          document.getElementById('record-name').innerText = 'No ID or payload provided in URL';
+        }
+      })();
+
+      function testBookmarklet() {
         const code = document.getElementById('record-code').innerText;
         if (!code.trim().startsWith('javascript:')) {
-            throw new Error('Bookmarklet must start with "javascript:"');
+          alert('Bookmarklet must start with "javascript:"');
+          return;
         }
-    
+
         const cleanCode = code.replace('javascript:', '');
         try {
-            new Function(cleanCode)();
+          new Function(cleanCode)();
         } catch (error) {
-            console.error('Error executing bookmarklet, attempting URI decoded version...', error);
-    
-            try {
-                const decoded = decodeURIComponent(cleanCode);
-                new Function(decoded)();
-            } catch (error) {
-                console.error('Error executing bookmarklet:', error);
-                alert('Error in bookmarklet code: ' + error.message);
-            }
+          console.error('Error executing bookmarklet, attempting URI decoded version...', error);
+          try {
+            const decoded = decodeURIComponent(cleanCode);
+            new Function(decoded)();
+          } catch (error) {
+            console.error('Error executing bookmarklet:', error);
+            alert('Error in bookmarklet code: ' + error.message);
+          }
         }
-    }
+      }
     </script>
   </body>
 </html>
