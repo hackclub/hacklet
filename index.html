@@ -81,7 +81,11 @@
             <pre>
               <code class="language-js">
                 javascript:(function() {
-                  alert('Hello, this is a bookmarklet!');
+                  var img = new Image();
+                  img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp'; // Replace with the URL of your image
+                  img.onload = function() {
+                    alert('Hello, this is a bookmarklet!');
+                  };
                 })();
               </code>
             </pre>
