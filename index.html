@@ -81,11 +81,8 @@
             <pre>
               <code class="language-js">
                 javascript:(function() {
-                  var img = new Image();
-                  img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp';
-                  img.onload = function() {
-                    alert('Hello, this is a bookmarklet!');
-                  };
+                  alert('Hello World');
+                  document.body.style.backgroundColor = 'lightblue';
                 })();
               </code>
             </pre>
@@ -104,12 +101,8 @@
           bookmarklet:
           <a
             href="javascript:(function() {
-                    alert('Before Image Load');
-                    var img = new Image();
-                    img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp';
-                    img.onload = function() {
-                      alert('Hello, this is a bookmarklet!');
-                    };
+                    alert('Hello World');
+                    document.body.style.backgroundColor = 'lightblue';
                   })();"
             >Click Me!</a
           >
