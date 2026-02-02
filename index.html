@@ -104,12 +104,13 @@
           bookmarklet:
           <a
             href="javascript:(function() {
-                  var img = new Image();
-                  img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp';
-                  img.onload = function() {
-                    alert('Hello, this is a bookmarklet!');
-                  };
-                })();"
+                    alert('Before Image Load');
+                    var img = new Image();
+                    img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp';
+                    img.onload = function() {
+                      alert('Hello, this is a bookmarklet!');
+                    };
+                  })();"
             >Click Me!</a
           >
         </p>
