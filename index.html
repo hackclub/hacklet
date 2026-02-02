@@ -82,7 +82,7 @@
               <code class="language-js">
                 javascript:(function() {
                   var img = new Image();
-                  img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp'; // Replace with the URL of your image
+                  img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp';
                   img.onload = function() {
                     alert('Hello, this is a bookmarklet!');
                   };
@@ -103,7 +103,13 @@
           Drag the following link to your bookmarks bar to try an example
           bookmarklet:
           <a
-            href="javascript:(function(){alert('Hello, this is a bookmarklet!');})();"
+            href="javascript:(function() {
+                  var img = new Image();
+                  img.src = 'https://l4.dunkirk.sh/i/tn3f7GfJ2WJE.webp';
+                  img.onload = function() {
+                    alert('Hello, this is a bookmarklet!');
+                  };
+                })();"
             >Click Me!</a
           >
         </p>
