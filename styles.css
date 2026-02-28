@@ -194,7 +194,7 @@ a {
 	margin-bottom: 10px;
 }
 
-#bookmarklet-form button {
+button {
 	background-color: #000;
 	color: #fff;
 	border: 2px solid #fff;
@@ -204,7 +204,7 @@ a {
 	transition: background-color 0.3s, color 0.3s;
 }
 
-#bookmarklet-form button:hover {
+button:hover {
 	background-color: #fff;
 	color: #000;
 }
