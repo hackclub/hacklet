@@ -3,51 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Hacklet - A Hack Club Event">
+    <meta name="description" content="Hacklet for Individuals" />
     <meta name="author" content="Hack Club" />
     <meta property="og:type" content="website" />
-    <meta name="keywords" content="hacklet, bookmarklet, hackclub, ysws, clubs" />
+    <meta name="keywords" content="hacklet, bookmarklet, individuals" />
     <title>Hacklet</title>
     <link rel="icon" href="icon.png" type="image/png" />
     <link rel="apple-touch-icon" href="icon.png" />
     <link rel="stylesheet" href="styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/terser@5.39.0/dist/bundle.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
-
     <script>
       hljs.highlightAll();
     </script>
   </head>
 
   <body>
-    
     <div class="github-mark">
       <a href="https://github.com/PianoMan0/hacklet" target="_blank">
         <img src="github-mark.svg" alt="GitHub Mark" />
       </a>
     </div>
-    
-      <center>
-        <h1 class="glitch-text" data-text="Hacklet">Hacklet</h1>
-        <a href="https://hackclub.com" aria-label="Hack Club homepage" target="_blank"><img class="hackclub-flag" src="https://assets.hackclub.com/flag-orpheus-left.svg" alt="Hack Club flag"></a>
+
+    <center>
+      <h1 class="glitch-text" data-text="Hacklet">Hacklet</h1>
+      <a href="https://hackclub.com" aria-label="Hack Club homepage" target="_blank"><img class="hackclub-flag" src="https://assets.hackclub.com/flag-orpheus-left.svg" alt="Hack Club flag"></a>
       <h2>Embark on a journey to bookmark the future.</h2>
       <h3>
         Hacklet is a <a href="https://ysws.hackclub.com" target="_blank">YSWS</a> about
         bookmarklets.
       </h3>
-      <h3>Build a bookmarklet, get coins for your club.</h3>
+      <h3>Build a bookmarklet, get a domain.</h3>
       <h3>Sponsored by Jared.</h3>
-      <a
-        href="rules.html"
-        style="display: inline-flex; align-items: center; gap: 5px"
-      >
-      <h3 style="margin: 0">The Rules</h3>
+      <a href="rules.html" style="display: inline-flex; align-items: center; gap: 5px">
+        <h3 style="margin: 0">The Rules</h3>
       </a>
       <span
         style="
@@ -60,11 +51,9 @@
       >
         <- click here!</span
       >
-      <br><br>      
-      <a href="https://forms.hackclub.com/hacklet-workshop" target="_blank"><button>Create a Workshop</button></a>
-      <a href="https://forms.hackclub.com/hacklet" target="_blank"><button>Submit</button></a>
-      <br />
-      <br />
+      <br><br>
+      <button type="button" onclick="goToClubsSite()">Go to clubs site</button>
+      <br /><br />
       <h2>What is a bookmarklet?</h2>
       <p>
         A bookmarklet is a small JavaScript program stored as a browser
@@ -144,16 +133,17 @@
         <a href="https://github.com/Charmunks" target="_blank">Charmunk</a>,
         <a href="https://saahild.com" target="_blank">Neon</a>!
       </p>
-    </div>
-    </span>
     </center>
+
     <script>
+      function goToClubsSite() {
+        window.location.href = 'index.html';
+      }
+
       function minifyJS(code) {
-        // Try to use Terser if available, but avoid throwing if it's not
         try {
           if (window.Terser && typeof Terser.minify === 'function') {
             const result = Terser.minify(code);
-            // Terser.minify may return a Promise in the browser bundle
             if (result && typeof result.then === 'function') {
               result
                 .then((r) => console.log('minified (async):', r && r.code))
@@ -167,6 +157,7 @@
         }
         return 'javascript:' + code;
       }
+
       function testBookmarklet() {
         const code = document.getElementById("bookmarklet-code").value;
         try {
@@ -233,36 +224,6 @@
           alert('Error creating share link: ' + e.message);
         }
       }
-
-      (function () {
-        const modal = document.createElement('div');
-        modal.id = 'site-choice-modal';
-        modal.innerHTML = `
-          <div class="site-choice-backdrop">
-            <div class="site-choice-dialog">
-              <h2>Choose your Hacklet experience</h2>
-              <p>Are you visiting as a club or as an individual?</p>
-              <div class="site-choice-buttons">
-                <button type="button" class="site-choice-btn clubs">Clubs site</button>
-                <button type="button" class="site-choice-btn individuals">Individuals site</button>
-              </div>
-            </div>
-          </div>
-        `;
-
-        const chooseSite = (choice) => {
-          modal.remove();
-
-          if (choice === 'individuals') {
-            window.location.href = 'individuals.html';
-          }
-        };
-
-        modal.querySelector('.clubs').addEventListener('click', () => chooseSite('clubs'));
-        modal.querySelector('.individuals').addEventListener('click', () => chooseSite('individuals'));
-
-        document.body.appendChild(modal);
-      })();
     </script>
   </body>
 </html>
